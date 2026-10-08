@@ -1,0 +1,24 @@
+[
+  {
+    "name": "待核验的公司广州招聘页/广州高校公开页（模板）",
+    "kind": "html",
+    "url": "https://careers.example.com/jobs",
+    "enabled": false,
+    "search_city": "广州"
+  },
+  {
+    "name": "待核验的 Greenhouse 企业岗位板（模板）",
+    "kind": "greenhouse",
+    "company": "填写已核验企业名称",
+    "board": "replace-with-verified-board",
+    "enabled": false,
+    "search_city": "上海"
+  },
+  {
+    "name": "待核验的深圳备用公开页（模板）",
+    "kind": "html",
+    "url": "https://careers.example.com/shenzhen",
+    "search_city": "深圳",
+    "enabled": false
+  }
+]

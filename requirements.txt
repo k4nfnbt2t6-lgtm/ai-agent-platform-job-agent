@@ -1,0 +1,8 @@
+# Platform 复用本机现有版本；pypdf 用于 Job Agent 本地简历解析。
+openai-agents==0.22.3
+openai==3.23.0
+pydantic==2.13.5
+# 6.19.0 修复旧版恶意 PDF 解析耗时/内存耗尽公告；保持本地解析接口。
+pypdf==6.19.0
+# 搜索层及离线 HTTP mock 直接使用，不依赖 SDK 间接安装。
+httpx2==2.13.1

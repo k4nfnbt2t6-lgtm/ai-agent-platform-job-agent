@@ -1,0 +1,86 @@
+[
+  {
+    "company": "人工示例科技",
+    "title": "AI Agent 开发实习生",
+    "city": "深圳",
+    "recruitment_type": "实习",
+    "jd": "岗位职责：参与 AI Agent 工具开发，分析和验证工作流。\n任职要求：2027届本科在读，专业不限；熟悉 Python、Git；掌握 Tool Calling。",
+    "source": "人工搜索样例（不是实际招聘）",
+    "url": "https://careers.example.com/jobs/agent-1",
+    "discovered_at": "2026-10-08T09:00:00+08:00",
+    "jd_kind": "full",
+    "valid_through": null
+  },
+  {
+    "company": "人工示例科技",
+    "title": "AI Agent 开发实习生",
+    "city": "深圳",
+    "recruitment_type": "实习",
+    "jd": "岗位职责：参与 AI Agent 工具开发，分析和验证工作流。\n任职要求：2027届本科在读，专业不限；熟悉 Python、Git；掌握 Tool Calling。",
+    "source": "人工重复来源",
+    "url": "https://campus.example.com/jobs/agent-1",
+    "discovered_at": "2026-10-08T09:00:00+08:00",
+    "jd_kind": "full",
+    "valid_through": null
+  },
+  {
+    "company": "人工应用科技",
+    "title": "LLM 应用开发实习生",
+    "city": "广州",
+    "recruitment_type": "实习",
+    "jd": "岗位职责：参与 LLM 应用与工具开发，验证业务流程。\n任职要求：2027届本科在读，熟悉 Python、Git、SQL；掌握 MCP；了解 LLM API。",
+    "source": "人工搜索样例（不是实际招聘）",
+    "url": "https://careers.example.com/jobs/llm-2",
+    "discovered_at": "2026-10-08T09:00:00+08:00",
+    "jd_kind": "full",
+    "valid_through": null
+  },
+  {
+    "company": "人工检索科技",
+    "title": "RAG 工程实习生",
+    "city": "深圳",
+    "recruitment_type": "实习",
+    "jd": "岗位职责：开发 RAG 应用与检索服务，维护技术质量。\n任职要求：2027届本科在读，掌握 RAG、向量检索、PyTorch、Docker。",
+    "source": "人工搜索样例（不是实际招聘）",
+    "url": "https://careers.example.com/jobs/rag-3",
+    "discovered_at": "2026-10-08T09:00:00+08:00",
+    "jd_kind": "full",
+    "valid_through": null
+  },
+  {
+    "company": "人工软件科技",
+    "title": "Java 后端实习生",
+    "city": "深圳",
+    "recruitment_type": "实习",
+    "jd": "岗位职责：参与 AI Agent 工具开发，分析和验证工作流。\n任职要求：2027届本科在读，专业不限；熟悉 Python、Git；掌握 Tool Calling。",
+    "source": "人工搜索样例（不是实际招聘）",
+    "url": "https://careers.example.com/jobs/java",
+    "discovered_at": "2026-10-08T09:00:00+08:00",
+    "jd_kind": "full",
+    "valid_through": null
+  },
+  {
+    "company": "人工示例科技",
+    "title": "AI Agent 高级工程师",
+    "city": "深圳",
+    "recruitment_type": "社招/全职",
+    "jd": "岗位职责：参与 AI Agent 工具开发，分析和验证工作流。\n任职要求：2027届本科在读，专业不限；熟悉 Python、Git；掌握 Tool Calling。",
+    "source": "人工搜索样例（不是实际招聘）",
+    "url": "https://careers.example.com/jobs/senior",
+    "discovered_at": "2026-10-08T09:00:00+08:00",
+    "jd_kind": "full",
+    "valid_through": null
+  },
+  {
+    "company": "人工毕业招聘",
+    "title": "AI Agent 开发实习生",
+    "city": "深圳",
+    "recruitment_type": "实习",
+    "jd": "岗位职责：参与 AI Agent 工具开发，分析和验证工作流。\n任职要求：2026届本科在读，专业不限；熟悉 Python、Git；掌握 Tool Calling。",
+    "source": "人工搜索样例（不是实际招聘）",
+    "url": "https://careers.example.com/jobs/2026",
+    "discovered_at": "2026-10-08T09:00:00+08:00",
+    "jd_kind": "full",
+    "valid_through": null
+  }
+]

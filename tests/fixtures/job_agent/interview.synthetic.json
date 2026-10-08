@@ -1,0 +1,438 @@
+{
+  "description": "人工合成离线测试数据；由现有mock生成，非真实API请求或响应。不代表真实模型质量验收。",
+  "original_payload_sha256": "525461216888b740a4b3c60698f0db076e66f81255925ffe462271e1db1cd29f",
+  "original_payload": {
+    "jd_segments": [
+      {
+        "id": "J1",
+        "quote": "公司:人工准备科技(测试样例,不是真实招聘)"
+      },
+      {
+        "id": "J2",
+        "quote": "岗位:AI Agent应用开发实习生"
+      },
+      {
+        "id": "J3",
+        "quote": "工作地点:广州"
+      },
+      {
+        "id": "J4",
+        "quote": "岗位职责:开发智能助手的工具调用流程,处理错误输入和异常;维护岗位数据去重与自动化测试。"
+      },
+      {
+        "id": "J5",
+        "quote": "任职要求:2027届本科在读,专业不限;熟悉Python,了解Tool Calling,能解释LLM API错误处理。"
+      },
+      {
+        "id": "J6",
+        "quote": "加分项:有MCP或RAG实践;有SQLite项目经验。"
+      }
+    ],
+    "resume_facts": [
+      {
+        "id": "F4",
+        "section": "skills",
+        "project": null,
+        "text": "Python基础",
+        "source": "Python基础",
+        "editable": false,
+        "boundary": "原样保留；不能证明新增能力"
+      },
+      {
+        "id": "F5",
+        "section": "skills",
+        "project": null,
+        "text": "API基础",
+        "source": "API基础",
+        "editable": false,
+        "boundary": "原样保留；不能证明新增能力"
+      },
+      {
+        "id": "F6",
+        "section": "skills",
+        "project": null,
+        "text": "正在学习或尚未熟练:MCP、RAG",
+        "source": "正在学习或尚未熟练:MCP、RAG\n",
+        "editable": false,
+        "boundary": "原样保留；不能证明新增能力"
+      },
+      {
+        "id": "F7",
+        "section": "projects",
+        "project": "AI Agent Platform",
+        "text": "AI Agent Platform",
+        "source": "### AI Agent Platform",
+        "editable": false,
+        "boundary": "只能证明本条实际描述"
+      },
+      {
+        "id": "F8",
+        "section": "projects",
+        "project": "AI Agent Platform",
+        "text": "使用 Python 实现工具调用与输入校验,通过本地测试验证异常处理。",
+        "source": "- 使用 Python 实现工具调用与输入校验,通过本地测试验证异常处理。",
+        "editable": true,
+        "boundary": "只能证明本条实际描述"
+      },
+      {
+        "id": "F9",
+        "section": "projects",
+        "project": "AI Agent Platform",
+        "text": "在 AI 辅助下整理会话与权限边界,保留本地运行入口。",
+        "source": "- 在 AI 辅助下整理会话与权限边界,保留本地运行入口。",
+        "editable": true,
+        "boundary": "只能证明本条实际描述"
+      },
+      {
+        "id": "F10",
+        "section": "projects",
+        "project": "Job Agent",
+        "text": "Job Agent",
+        "source": "### Job Agent",
+        "editable": false,
+        "boundary": "只能证明本条实际描述"
+      },
+      {
+        "id": "F11",
+        "section": "projects",
+        "project": "Job Agent",
+        "text": "使用 SQLite 保存岗位记录并实现去重,通过测试验证重复岗位处理。",
+        "source": "- 使用 SQLite 保存岗位记录并实现去重,通过测试验证重复岗位处理。",
+        "editable": true,
+        "boundary": "只能证明本条实际描述"
+      },
+      {
+        "id": "F12",
+        "section": "projects",
+        "project": "Job Agent",
+        "text": "基于真实文本区分学习中与项目实践,生成岗位匹配报告。",
+        "source": "- 基于真实文本区分学习中与项目实践,生成岗位匹配报告。",
+        "editable": false,
+        "boundary": "原样保留；不能证明新增能力"
+      },
+      {
+        "id": "F13",
+        "section": "projects",
+        "project": "Jieqi Agent",
+        "text": "Jieqi Agent",
+        "source": "### Jieqi Agent",
+        "editable": false,
+        "boundary": "只能证明本条实际描述"
+      },
+      {
+        "id": "F14",
+        "section": "projects",
+        "project": "Jieqi Agent",
+        "text": "在 AI 辅助下复现本地存储异常,修复同页面重连问题并补充测试。",
+        "source": "- 在 AI 辅助下复现本地存储异常,修复同页面重连问题并补充测试。",
+        "editable": true,
+        "boundary": "只能证明本条实际描述"
+      }
+    ],
+    "topics": [
+      {
+        "id": "T1",
+        "type": "technical",
+        "topic": "Python",
+        "question_kind": "learning",
+        "status": "learning",
+        "resume_ids": [
+          "F4",
+          "F8"
+        ]
+      },
+      {
+        "id": "T2",
+        "type": "technical",
+        "topic": "AI 应用开发",
+        "question_kind": "learning",
+        "status": "needs_confirmation",
+        "resume_ids": [
+          "F7",
+          "F10",
+          "F12"
+        ]
+      },
+      {
+        "id": "T3",
+        "type": "technical",
+        "topic": "Tool Calling",
+        "question_kind": "jd_technical",
+        "status": "matched",
+        "resume_ids": [
+          "F8"
+        ]
+      },
+      {
+        "id": "T4",
+        "type": "technical",
+        "topic": "LLM API",
+        "question_kind": "learning",
+        "status": "not_evidenced",
+        "resume_ids": []
+      },
+      {
+        "id": "T5",
+        "type": "technical",
+        "topic": "错误处理",
+        "question_kind": "learning",
+        "status": "needs_confirmation",
+        "resume_ids": []
+      },
+      {
+        "id": "T6",
+        "type": "technical",
+        "topic": "SQL",
+        "question_kind": "learning",
+        "status": "needs_confirmation",
+        "resume_ids": [
+          "F11"
+        ]
+      },
+      {
+        "id": "T7",
+        "type": "technical",
+        "topic": "RAG",
+        "question_kind": "learning",
+        "status": "learning",
+        "resume_ids": [
+          "F6"
+        ]
+      },
+      {
+        "id": "T8",
+        "type": "project",
+        "topic": "AI Agent Platform",
+        "question_kind": "project_followup",
+        "status": "needs_confirmation",
+        "resume_ids": [
+          "F7",
+          "F8",
+          "F9"
+        ]
+      },
+      {
+        "id": "T9",
+        "type": "project",
+        "topic": "Job Agent",
+        "question_kind": "project_followup",
+        "status": "needs_confirmation",
+        "resume_ids": [
+          "F10",
+          "F11",
+          "F12"
+        ]
+      },
+      {
+        "id": "T10",
+        "type": "project",
+        "topic": "Jieqi Agent",
+        "question_kind": "project_followup",
+        "status": "needs_confirmation",
+        "resume_ids": [
+          "F13",
+          "F14"
+        ]
+      }
+    ]
+  },
+  "response": {
+    "questions": [
+      {
+        "topic_id": "T1",
+        "question": "Python 在智能助手输入失败时应如何设计验证边界（主题 1）？",
+        "reference_answer": "针对 Python，可以先明确输入约束、成功输出和失败状态，再验证异常不会被误记为完成。用正常、无效输入和中途失败样例检查结果；涉及写入时应先校验再提交，保留可解释错误。这样可以将输入错误与执行错误分开定位；测试还应检查失败前后的状态一致，并说明哪些步骤已经完成、哪些尚未执行。",
+        "knowledge_points": [
+          "Python",
+          "输入校验",
+          "失败验证"
+        ],
+        "follow_ups": [],
+        "learning_advice": "先按原文核对已完成范围；未掌握的部分做最小例子，用测试验证后再准备个人回答。",
+        "jd_ids": [
+          "J4"
+        ],
+        "resume_ids": [
+          "F4",
+          "F8"
+        ]
+      },
+      {
+        "topic_id": "T2",
+        "question": "AI 应用开发 在智能助手输入失败时应如何设计验证边界（主题 2）？",
+        "reference_answer": "针对 AI 应用开发，可以先明确输入约束、成功输出和失败状态，再验证异常不会被误记为完成。用正常、无效输入和中途失败样例检查结果；涉及写入时应先校验再提交，保留可解释错误。这样可以将输入错误与执行错误分开定位；测试还应检查失败前后的状态一致，并说明哪些步骤已经完成、哪些尚未执行。",
+        "knowledge_points": [
+          "AI 应用开发",
+          "输入校验",
+          "失败验证"
+        ],
+        "follow_ups": [],
+        "learning_advice": "先按原文核对已完成范围；未掌握的部分做最小例子，用测试验证后再准备个人回答。",
+        "jd_ids": [
+          "J4"
+        ],
+        "resume_ids": [
+          "F7",
+          "F8",
+          "F9"
+        ]
+      },
+      {
+        "topic_id": "T3",
+        "question": "Tool Calling 在智能助手输入失败时应如何设计验证边界（主题 3）？",
+        "reference_answer": "针对 Tool Calling，可以先明确输入约束、成功输出和失败状态，再验证异常不会被误记为完成。用正常、无效输入和中途失败样例检查结果；涉及写入时应先校验再提交，保留可解释错误。这样可以将输入错误与执行错误分开定位；测试还应检查失败前后的状态一致，并说明哪些步骤已经完成、哪些尚未执行。",
+        "knowledge_points": [
+          "Tool Calling",
+          "输入校验",
+          "失败验证"
+        ],
+        "follow_ups": [],
+        "learning_advice": "先按原文核对已完成范围；未掌握的部分做最小例子，用测试验证后再准备个人回答。",
+        "jd_ids": [
+          "J4"
+        ],
+        "resume_ids": [
+          "F8"
+        ]
+      },
+      {
+        "topic_id": "T4",
+        "question": "LLM API 在智能助手输入失败时应如何设计验证边界（主题 4）？",
+        "reference_answer": "针对 LLM API，可以先明确输入约束、成功输出和失败状态，再验证异常不会被误记为完成。用正常、无效输入和中途失败样例检查结果；涉及写入时应先校验再提交，保留可解释错误。这样可以将输入错误与执行错误分开定位；测试还应检查失败前后的状态一致，并说明哪些步骤已经完成、哪些尚未执行。",
+        "knowledge_points": [
+          "LLM API",
+          "输入校验",
+          "失败验证"
+        ],
+        "follow_ups": [],
+        "learning_advice": "先按原文核对已完成范围；未掌握的部分做最小例子，用测试验证后再准备个人回答。",
+        "jd_ids": [
+          "J4"
+        ],
+        "resume_ids": []
+      },
+      {
+        "topic_id": "T5",
+        "question": "错误处理 在智能助手输入失败时应如何设计验证边界（主题 5）？",
+        "reference_answer": "针对 错误处理，可以先明确输入约束、成功输出和失败状态，再验证异常不会被误记为完成。用正常、无效输入和中途失败样例检查结果；涉及写入时应先校验再提交，保留可解释错误。这样可以将输入错误与执行错误分开定位；测试还应检查失败前后的状态一致，并说明哪些步骤已经完成、哪些尚未执行。",
+        "knowledge_points": [
+          "错误处理",
+          "输入校验",
+          "失败验证"
+        ],
+        "follow_ups": [],
+        "learning_advice": "先按原文核对已完成范围；未掌握的部分做最小例子，用测试验证后再准备个人回答。",
+        "jd_ids": [
+          "J4"
+        ],
+        "resume_ids": [
+          "F8"
+        ]
+      },
+      {
+        "topic_id": "T6",
+        "question": "SQL 在智能助手输入失败时应如何设计验证边界（主题 6）？",
+        "reference_answer": "针对 SQL，可以先明确输入约束、成功输出和失败状态，再验证异常不会被误记为完成。用正常、无效输入和中途失败样例检查结果；涉及写入时应先校验再提交，保留可解释错误。这样可以将输入错误与执行错误分开定位；测试还应检查失败前后的状态一致，并说明哪些步骤已经完成、哪些尚未执行。",
+        "knowledge_points": [
+          "SQL",
+          "输入校验",
+          "失败验证"
+        ],
+        "follow_ups": [],
+        "learning_advice": "先按原文核对已完成范围；未掌握的部分做最小例子，用测试验证后再准备个人回答。",
+        "jd_ids": [
+          "J4"
+        ],
+        "resume_ids": [
+          "F11"
+        ]
+      },
+      {
+        "topic_id": "T7",
+        "question": "RAG 在智能助手输入失败时应如何设计验证边界（主题 7）？",
+        "reference_answer": "针对 RAG，可以先明确输入约束、成功输出和失败状态，再验证异常不会被误记为完成。用正常、无效输入和中途失败样例检查结果；涉及写入时应先校验再提交，保留可解释错误。这样可以将输入错误与执行错误分开定位；测试还应检查失败前后的状态一致，并说明哪些步骤已经完成、哪些尚未执行。",
+        "knowledge_points": [
+          "RAG",
+          "输入校验",
+          "失败验证"
+        ],
+        "follow_ups": [],
+        "learning_advice": "先按原文核对已完成范围；未掌握的部分做最小例子，用测试验证后再准备个人回答。",
+        "jd_ids": [
+          "J4"
+        ],
+        "resume_ids": [
+          "F6"
+        ]
+      },
+      {
+        "topic_id": "T8",
+        "question": "AI Agent Platform 在智能助手输入失败时应如何设计验证边界（主题 8）？",
+        "reference_answer": "针对 AI Agent Platform，可以先明确输入约束、成功输出和失败状态，再验证异常不会被误记为完成。用正常、无效输入和中途失败样例检查结果；涉及写入时应先校验再提交，保留可解释错误。这样可以将输入错误与执行错误分开定位；测试还应检查失败前后的状态一致，并说明哪些步骤已经完成、哪些尚未执行。",
+        "knowledge_points": [
+          "AI Agent Platform",
+          "输入校验",
+          "失败验证"
+        ],
+        "follow_ups": [
+          "若输入无效，怎样证明没有发生写入？",
+          "失败后再次执行，如何避免重复处理？"
+        ],
+        "learning_advice": "先按原文核对已完成范围；未掌握的部分做最小例子，用测试验证后再准备个人回答。",
+        "jd_ids": [
+          "J4"
+        ],
+        "resume_ids": [
+          "F7",
+          "F8",
+          "F9"
+        ]
+      },
+      {
+        "topic_id": "T9",
+        "question": "Job Agent 在智能助手输入失败时应如何设计验证边界（主题 9）？",
+        "reference_answer": "针对 Job Agent，可以先明确输入约束、成功输出和失败状态，再验证异常不会被误记为完成。用正常、无效输入和中途失败样例检查结果；涉及写入时应先校验再提交，保留可解释错误。这样可以将输入错误与执行错误分开定位；测试还应检查失败前后的状态一致，并说明哪些步骤已经完成、哪些尚未执行。",
+        "knowledge_points": [
+          "Job Agent",
+          "输入校验",
+          "失败验证"
+        ],
+        "follow_ups": [
+          "若输入无效，怎样证明没有发生写入？",
+          "失败后再次执行，如何避免重复处理？"
+        ],
+        "learning_advice": "先按原文核对已完成范围；未掌握的部分做最小例子，用测试验证后再准备个人回答。",
+        "jd_ids": [
+          "J4"
+        ],
+        "resume_ids": [
+          "F10",
+          "F11",
+          "F12"
+        ]
+      },
+      {
+        "topic_id": "T10",
+        "question": "Jieqi Agent 在智能助手输入失败时应如何设计验证边界（主题 10）？",
+        "reference_answer": "针对 Jieqi Agent，可以先明确输入约束、成功输出和失败状态，再验证异常不会被误记为完成。用正常、无效输入和中途失败样例检查结果；涉及写入时应先校验再提交，保留可解释错误。这样可以将输入错误与执行错误分开定位；测试还应检查失败前后的状态一致，并说明哪些步骤已经完成、哪些尚未执行。",
+        "knowledge_points": [
+          "Jieqi Agent",
+          "输入校验",
+          "失败验证"
+        ],
+        "follow_ups": [
+          "若输入无效，怎样证明没有发生写入？",
+          "失败后再次执行，如何避免重复处理？"
+        ],
+        "learning_advice": "先按原文核对已完成范围；未掌握的部分做最小例子，用测试验证后再准备个人回答。",
+        "jd_ids": [
+          "J4"
+        ],
+        "resume_ids": [
+          "F13",
+          "F14"
+        ]
+      }
+    ]
+  }
+}
