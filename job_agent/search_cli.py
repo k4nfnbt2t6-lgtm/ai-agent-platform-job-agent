@@ -61,7 +61,7 @@ def read_json_file(filename):
     return text
 
 
-async def collect_search(args):
+async def collect_search(args, *, eligible=None):
     """共同搜索入口；只读取公开源或离线输入，不调用分析或模型。"""
     demo = getattr(args, "search_demo", False)
     fixture = PROJECT / "job_agent/examples/search-jobs.example.json" if demo else getattr(args, "search_fixture", None)
@@ -73,7 +73,7 @@ async def collect_search(args):
         from .discovery import candidate_filter, similar_job
         imported = [JobCandidate(**item) for item in items]
         selection = select_cities(imported, getattr(args, "city_min", 2), getattr(args, "guangzhou_only", False),
-                                  getattr(args, "search_limit", 8), eligible=lambda job: candidate_filter(job)["eligible"], same_job=similar_job)
+                                  getattr(args, "search_limit", 8), eligible=lambda job: candidate_filter(job)["eligible"] and (eligible is None or eligible(job)), same_job=similar_job)
         candidates = selected_with_aliases(selection, imported, getattr(args, "search_limit", 8), similar_job)
         search = {"candidates": candidates, "issues": [], "http_requests": 0}
         search["city_policy"] = selection["policy"]
@@ -84,7 +84,8 @@ async def collect_search(args):
         sources = load_sources(read_json_file(args.sources))
         print("只读公开来源：" + "；".join(source["name"] + " " + source["url"] for source in sources))
         search = await search_public(sources, PublicFetcher(sources, allow_network=args.allow_network), getattr(args, "search_limit", 8),
-                                     getattr(args, "city_min", 2), getattr(args, "guangzhou_only", False))
+                                     getattr(args, "city_min", 2), getattr(args, "guangzhou_only", False),
+                                     **({"eligible": eligible} if eligible is not None else {}))
     return search
 
 
@@ -107,7 +108,7 @@ async def run_search(args, resume, emit, approve_llm):
         result["city_policy"] = search["city_policy"]
         result.update(search_issues=search["issues"], http_requests=search["http_requests"],
                       source_checks=search.get("source_checks", []), source_health=SourceHealthStore(runtime.workspace.memory).list(),
-                      input_kind="artificial_or_imported" if fixture else "public_network", analysis_usage=runtime.usage())
+                input_kind="artificial_or_imported" if fixture else search.get("input_kind", "public_network"), analysis_usage=runtime.usage())
         print_priority_list(result)
         print_source_checks(result["source_checks"])
         path = runtime.workspace.root / ("priority-list-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%f") + ".json")

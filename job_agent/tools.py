@@ -17,14 +17,14 @@ async def get_analysis(workspace):
     if workspace.jd is None:
         raise ValueError("请先由用户提供 JD。")
     backend = workspace.llm
-    cached = workspace.memory.get_llm(workspace.jd, backend.config.model) if backend else workspace.memory.get(workspace.jd)
+    cached = workspace.memory.get_llm(workspace.jd, backend.cache_model) if backend else workspace.memory.get(workspace.jd)
     if cached:
         workspace.analysis_result = {"ok": True, **cached, "cache_hit": True}
     else:
         if backend:
             output = await backend.ask("analyze-jd", {"jd": workspace.jd}, JDOutput)
             report = checked_jd(output, workspace.jd)
-            record = workspace.memory.remember_llm(workspace.jd, report, workspace.source_label, backend.config.model)
+            record = workspace.memory.remember_llm(workspace.jd, report, workspace.source_label, backend.cache_model)
         else:
             report = analyze_text(workspace.jd)
             record = workspace.memory.remember(workspace.jd, report, workspace.source_label)

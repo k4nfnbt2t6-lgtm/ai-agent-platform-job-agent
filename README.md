@@ -130,6 +130,8 @@ macOS 部署适配使用现有v5持久计划与跨进程锁，默认北京时间
 
 向招聘方展示时使用人工材料，按 [作品集演示与真实开发边界](docs/PORTFOLIO.md) 展示底座、求职闭环、岗位状态、准备材料和异常回归。项目由AI辅助开发，个人理解、贡献和熟练度需要本人如实说明。
 
+可选浏览器层采用 **Playwright Python**，用于隔离HTML快照渲染和真实Chromium模拟申请表单；复用原Skill、评分、SQLite、去重与回执恢复，没有真实网站自动投递出口，不改变每日任务。安装、离线演示和测试见 [浏览器集成](docs/BROWSER_INTEGRATION.md)；browser-use、Stagehand、JobSpy及中国招聘方案的取舍见 [成熟方案评估](docs/OPEN_SOURCE_EVALUATION.md)。
+
 ## LLM 配置与授权
 
 沿用环境变量 `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL`，配置项见 [.env.example](.env.example)。示例 Key 为空；程序不会自动加载 `.env`。不要把真实 Key 写进源码、命令历史或聊天。
@@ -137,6 +139,14 @@ macOS 部署适配使用现有v5持久计划与跨进程锁，默认北京时间
 `--mode llm` 在发送前展示材料范围、目标 API、模型、次数与预计费用，等待当前用户确认。连接配置或历史验收不代表授权新的付费请求或真实简历上传。保留结构校验、原文证据核对、有界预算与失败停止；不自动重试可能收费的请求。定时检查仍为 local。
 
 ## 测试
+
+新增可选的自动分析/模拟投递开发层：
+
+```bash
+.venv/bin/python -B -m job_agent.automation demo --mode mock-llm
+```
+
+使用人工材料、本地模型替身及模拟招聘平台；不联网、不付费、不改变真实投递状态或已启用的每日任务。支持持久化每日额度、资格优先决策、独立材料、申请去重/回执恢复与紧急停止。真实申请适配器未启用，自动付费需独立确认；详见[自动化范围、使用与授权](docs/JOB_AUTOMATION.md)。稳定v6的五个Skill及原入口保持可用，开发版尚未发布。
 
 Job Agent 全部测试：
 
@@ -172,7 +182,7 @@ docs/                    架构、macOS部署、作品集及最终审查说明
 
 ## 版本管理与安全
 
-本地 Git 已初始化，尚未配置远程或发布。可纳入 Git 的内容是源码、五个 Skill、人工样例、离线测试、依赖声明和经过清理的说明文档。
+稳定版本已发布；新增自动化能力仍在独立本地开发分支，未经授权不上传。可纳入 Git 的内容是源码、五个 Skill、人工样例、离线测试、依赖声明和经过清理的说明文档。
 
 真实简历、个人信息、密钥、数据库、状态、运行日志、真实 API 请求/响应、个人授权指令与历史运行笔记仅留本地。`.gitignore` 是防误提交措施，不能加密文件，也不能阻止 `git add -f`；每次提交/上传前仍需审查暂存区。详见 [安全说明](SECURITY.md)。未经明确授权不推送、不发布、不上传材料。
 
@@ -183,3 +193,14 @@ docs/                    架构、macOS部署、作品集及最终审查说明
 已核验的官方来源配置、真实可用性及未启用原因见 [岗位来源核验](job_agent/SOURCE_VERIFICATION.md)。广州优先，不足才上海、再深圳；搜索保持公开只读，不向招聘来源发送简历。只搜索的完整命令见 [Job Agent 说明](job_agent/README.md#已核验公开来源工程化第二阶段)。
 
 发布前身份处理、仓库名称/简介和确认清单见 [GitHub发布准备](docs/GITHUB_RELEASE.md)。
+## 实际应用集成（独立开发分支）
+
+自动LLM、申请账本和可选Playwright成果已整合到 `codex/application-integration`，未推送或替换GitHub稳定版。**真实自动投递未启用**。飞派/Coremail官方邮件入口保留人工交接；新增Lever官方公开GET格式适配与安全JD导入，未宣称新增已验证的广州接口租户。
+
+从项目目录运行人工材料完整模拟（先按[浏览器说明](docs/BROWSER_INTEGRATION.md)准备独立环境并设置浏览器路径）：
+
+```bash
+.agent-platform/browser-eval-venv/bin/python -m job_agent.automation demo --mode mock-llm --application-mode browser-mock --state-dir .agent-platform/application-integration-demo
+```
+
+搜索/API格式替身、三个分析Skill、资格决策、独立材料、真实隔离Chromium填写/文件上传、模拟收件与SQLite去重均可离线验证。详细渠道结论、JD导入备选、关闭状态的LLM预算计划及真实启用要求见[实际应用集成报告](docs/APPLICATION_INTEGRATION.md)。现有每日任务仍保持local。

@@ -307,13 +307,21 @@ def load_sources(text):
             raise ValueError("来源配置格式错误。")
         if not source.get("enabled", False):
             continue
-        if source.get("kind") not in ("html", "greenhouse") or not isinstance(source.get("name"), str):
-            raise ValueError("来源只支持 html / greenhouse，并需要名称。")
+        if source.get("kind") not in ("html", "greenhouse", "lever") or not isinstance(source.get("name"), str):
+            raise ValueError("来源只支持 html / greenhouse / lever，并需要名称。")
         if source["kind"] == "greenhouse":
             board = source.get("board", "")
             if not isinstance(board, str) or not re.fullmatch(r"[a-zA-Z0-9_-]{1,100}", board) or not isinstance(source.get("company"), str) or not source["company"].strip():
                 raise ValueError("公开 Job Board 需要已核验的 board 与公司名称。")
             source = {**source, "url": f"https://boards-api.greenhouse.io/v1/boards/{board}/jobs?content=true"}
+        elif source["kind"] == "lever":
+            tenant, region = source.get("tenant", ""), source.get("region", "global")
+            if (not isinstance(tenant, str) or not re.fullmatch(r"[a-zA-Z0-9_-]{1,100}", tenant)
+                or region not in ("global", "eu") or not isinstance(source.get("company"), str)
+                or not source["company"].strip()):
+                raise ValueError("Lever 需要已核验的租户、公司名称与区域。")
+            host = "api.eu.lever.co" if region == "eu" else "api.lever.co"
+            source = {**source, "url": f"https://{host}/v0/postings/{tenant}?mode=json&limit=100"}
         else:
             for field in ("link_pattern",):
                 if field in source:
@@ -403,11 +411,13 @@ class PublicFetcher:
         return await self.request(url)
 
 
-async def search_public(sources, fetcher, limit=8, city_min=2, guangzhou_only=False):
+async def search_public(sources, fetcher, limit=8, city_min=2, guangzhou_only=False, *, eligible=None):
     """按显式来源阶段搜索；上一阶段已足够时不访问下一城市来源。"""
     from .city_policy import CITY_ORDER, city_fit, select_cities, selected_with_aliases
     from .discovery import candidate_filter, similar_job
     from .source_health import source_check
+    def acceptable(job):
+        return candidate_filter(job)["eligible"] and (eligible is None or eligible(job))
     if not 1 <= limit <= 20 or not 1 <= city_min <= 20:
         raise ValueError("候选上限与城市扩展阈值需要 1 到 20。")
     found, issues, visited, stages = [], [], set(), []
@@ -435,6 +445,14 @@ async def search_public(sources, fetcher, limit=8, city_min=2, guangzhou_only=Fa
                     run["pages"].append(url)
                     if source["kind"] == "greenhouse":
                         jobs, errors = parse_greenhouse(body, source)
+                    elif source["kind"] == "lever":
+                        from .lever import parse_lever
+                        jobs, errors = parse_lever(body, source)
+                        if len(json.loads(body)) >= 100:
+                            if pages < 4:
+                                queue.append(source["url"] + "&skip=" + str(pages * 100))
+                            else:
+                                errors.append("Lever达到本轮分页上限，结果可能不完整；不静默宣称全部岗位已检查。")
                     else:
                         jobs, links, errors = parse_public_page(body, source, url)
                         if pages < 4:
@@ -456,7 +474,7 @@ async def search_public(sources, fetcher, limit=8, city_min=2, guangzhou_only=Fa
                     issues.extend({"source": source["name"], "source_url": source["url"], "page_url": url, "reason": error} for error in errors)
 
                     counted = select_cities(found, city_min, guangzhou_only, limit,
-                                            eligible=lambda job: candidate_filter(job)["eligible"], same_job=similar_job)
+                                            eligible=acceptable, same_job=similar_job)
                     count = sum(city_fit(job)["priority"] <= CITY_ORDER.index(city) + 1 for job in counted["selected"])
                     if count >= min(city_min, limit):
                         break
@@ -465,13 +483,13 @@ async def search_public(sources, fetcher, limit=8, city_min=2, guangzhou_only=Fa
                     issues.append({"source": source["name"], "source_url": source["url"], "page_url": url, "reason": message})
                     run["failures"].append(message)
             selected = select_cities(found, city_min, guangzhou_only, limit,
-                                     eligible=lambda job: candidate_filter(job)["eligible"], same_job=similar_job)
+                                     eligible=acceptable, same_job=similar_job)
             # 上海/深圳混入前一阶段的公开列表，不计为广州有效数量。
             current_count = sum(city_fit(job)["priority"] <= CITY_ORDER.index(city) + 1 for job in selected["selected"])
             if current_count >= min(city_min, limit):
                 break
         selected = select_cities(found, city_min, guangzhou_only, limit,
-                                 eligible=lambda job: candidate_filter(job)["eligible"], same_job=similar_job)
+                                 eligible=acceptable, same_job=similar_job)
         # 共享来源已经读过：复用其中下一城市的岗位，不再次抓相同 URL。
         current_count = sum(city_fit(job)["priority"] <= CITY_ORDER.index(city) + 1 for job in selected["selected"])
         if current_count >= min(city_min, limit):
@@ -484,6 +502,11 @@ async def search_public(sources, fetcher, limit=8, city_min=2, guangzhou_only=Fa
               if run["pages"] or run["failures"] else
               {"name": source["name"], "url": source["url"], "status": "not_checked", "last_success_at": None}
               for source in sources for run in [source_runs[source["url"]]]]
+    execution = ("mock_transport" if fetcher.transport is not None else "public_network") if type(fetcher) is PublicFetcher else "custom_fetcher_unverified"
+    for check in checks:
+        check["execution"] = execution
+        if execution != "public_network":
+            check["verified_real_search"] = False
     return {"candidates": selected_with_aliases(selected, found, limit, similar_job), "issues": issues, "http_requests": fetcher.requests,
-            "source_checks": checks,
+            "source_checks": checks, "input_kind": execution,
             "city_policy": selected["policy"], "excluded": excluded}

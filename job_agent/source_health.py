@@ -42,7 +42,7 @@ class SourceHealthStore:
     def record(self, checks):
         with self.db:
             for check in checks:
-                if check["status"] == "not_checked":
+                if check["status"] == "not_checked" or check.get("execution") in ("mock_transport", "custom_fetcher_unverified"):
                     continue
                 previous = self.db.execute("SELECT last_success_at FROM job_source_checks WHERE source_url=?", (check["url"],)).fetchone()
                 saved = {**check, "last_success_at": check["last_success_at"] or (previous[0] if previous else None)}
@@ -59,6 +59,7 @@ def print_source_checks(checks):
               "no_open_jobs": "来源明确显示岗位已过期", "readable_parse_failed": "来源可读但解析失败",
               "fetch_failed": "访问失败", "not_checked": "本轮未访问（城市/数量策略）"}
     for check in checks:
-        print(f"来源核验：{check['name']} | {labels[check['status']]} | 可筛选岗位 {check.get('eligible_count', 0)}")
+        label = "模拟/未核验读取器（非真实搜索验收）" if check.get("execution") in ("mock_transport", "custom_fetcher_unverified") else labels[check['status']]
+        print(f"来源核验：{check['name']} | {label} | 可筛选岗位 {check.get('eligible_count', 0)}")
         if check.get("availability_note"):
             print("  " + check["availability_note"])

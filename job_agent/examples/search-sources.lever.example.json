@@ -1,0 +1,17 @@
+[
+  {
+    "name": "待核验企业的Lever公开职位",
+    "company": "填写已核验企业名称",
+    "kind": "lever",
+    "tenant": "replace-with-verified-tenant",
+    "region": "global",
+    "search_city": "不限",
+    "enabled": false,
+    "verification": {
+      "status": "not_verified",
+      "verified_real_search": false,
+      "last_success_at": null,
+      "failure_reason": "示例不是真实广州来源；须核验企业官网关联、实际工作城市和公开GET后才能启用。"
+    }
+  }
+]

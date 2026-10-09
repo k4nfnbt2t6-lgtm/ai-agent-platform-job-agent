@@ -92,12 +92,14 @@ class JobModel(DemoModel):
 class JobRuntime(PlatformRuntime):
     session_namespace = "job:"
 
-    def __init__(self, *args, mode="local", model=None, fallback="local", approve_llm=None, **kwargs):
+    def __init__(self, *args, mode="local", model=None, fallback="local", approve_llm=None, analysis_backend=None, **kwargs):
         if mode not in ("local", "llm") or fallback not in ("local", "none"):
             raise ValueError("分析模式或 fallback 配置无效。")
         self.requested_mode, self.fallback, self.approve_llm = mode, fallback, approve_llm
         self.analysis_lock = asyncio.Lock()
-        self.llm = LLMAnalyzer(LLMConfig.from_env(model)) if mode == "llm" else None
+        if analysis_backend is not None and mode != "llm":
+            raise ValueError("自定义 LLM 后端只能用于 llm 模式。")
+        self.llm = (analysis_backend or LLMAnalyzer(LLMConfig.from_env(model))) if mode == "llm" else None
         # SDK 决策循环仍由统一底座执行；付费调用只在获准的业务工具内发生。
         if mode == "llm":
             kwargs["demo"] = True
@@ -230,7 +232,7 @@ class JobRuntime(PlatformRuntime):
         fallback_reason = None
         if self.llm:
             try:
-                cached = self.workspace.memory.get_llm(self.workspace.jd, self.llm.config.model)
+                cached = self.workspace.memory.get_llm(self.workspace.jd, self.llm.cache_model)
                 calls = {"analyze-jd": 1, "match-resume": 2, "skill-gap-analysis": 3, "all": 3}[selected] - bool(cached)
                 estimate = self.llm.estimate(self.workspace.jd, self.workspace.resume, calls)
                 self.llm.preflight(estimate)
@@ -280,9 +282,14 @@ class JobRuntime(PlatformRuntime):
                     quality_warning="质量降级：local 规则不能替代 LLM 语义验收，请人工复核。" if fallback_reason else None)
         data.update(requested_mode=self.requested_mode, model=self.llm.config.model if self.workspace.llm else None,
                     schema_version=SCHEMA_VERSION, fallback_reason=fallback_reason)
+        data = self.decorate_analysis_report(data)
         if self.llm:
             data["llm_usage"] = self.llm.usage()
             self.workspace.memory.save_report(self.workspace.jd, self.workspace.resume, selected, data)
         data["job_id"] = self.workspace.memory.library.remember_analysis(
             self.workspace.jd, data["jd_analysis"]["analysis"], self.workspace.source_label, data)
+        return data
+
+    def decorate_analysis_report(self, data):
+        """派生运行时可标注模拟/缓存来源；默认报告行为保持不变。"""
         return data

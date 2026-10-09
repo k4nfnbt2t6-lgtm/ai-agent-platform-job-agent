@@ -163,7 +163,7 @@ class DailyUpdates:
                         status = "failed"
                     self.store.finish(run_id, self.clock(), summary, status)
                     print("\n岗位检查结束：" + status)
-                    print_update(summary)
+                    self.print_summary(summary)
                     print_source_checks(summary["source_checks"])
                     return summary
             except asyncio.CancelledError:
@@ -173,11 +173,14 @@ class DailyUpdates:
             except Exception as error:
                 summary = make_summary(self.store.rows(run_id), issues=[{"reason": "检查失败（" + type(error).__name__ + "），本次不重试；请检查本地材料和来源。"}])
                 self.store.finish(run_id, self.clock(), summary, "failed")
-                print_update(summary)
+                self.print_summary(summary)
                 return summary
             finally:
                 if worker:
                     await worker.close()
+
+    def print_summary(self, summary):
+        print_update(summary)
 
     async def _analyze_updates(self, worker, search, resume, run_id):
         memory = worker.workspace.memory

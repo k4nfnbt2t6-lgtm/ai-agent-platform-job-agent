@@ -285,13 +285,18 @@ def checked_gaps(output, matching):
 
 
 class LLMAnalyzer:
-    def __init__(self, config):
+    def __init__(self, config, *, client_factory=None):
         self.config = config
+        self.client_factory = client_factory
         self.requests = self.input_tokens = self.output_tokens = 0
         self.failed = self.unknown_usage = False
         self.last_error = None
         self.last_error_kind = None
         self.last_input_estimate = 30_000
+
+    @property
+    def cache_model(self):
+        return self.config.model
 
     def cost(self, input_tokens, output_tokens):
         return (input_tokens * self.config.input_price + output_tokens * self.config.output_price) * 10 / 1_000_000
@@ -354,7 +359,8 @@ class LLMAnalyzer:
         received_usage = False
         try:
             async with asyncio.timeout(self.config.timeout_seconds):
-                async with AsyncOpenAI(api_key=self.config.api_key, base_url=self.config.base_url, timeout=self.config.timeout_seconds, max_retries=0) as client:
+                factory = self.client_factory or AsyncOpenAI
+                async with factory(api_key=self.config.api_key, base_url=self.config.base_url, timeout=self.config.timeout_seconds, max_retries=0) as client:
                     response = await client.responses.create(model=self.config.model,
                         input=[{"role": "system", "content": prompt}, {"role": "user", "content": body}],
                         text={"format": {"type": "json_schema", "name": schema.__name__, "strict": True, "schema": schema.model_json_schema()}},
