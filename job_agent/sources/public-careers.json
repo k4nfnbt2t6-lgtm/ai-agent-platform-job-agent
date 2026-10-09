@@ -1,0 +1,187 @@
+[
+  {
+    "name": "飞派科技官方招聘",
+    "company": "飞派科技",
+    "url": "https://flypai.com/jobs.html",
+    "search_city": "广州",
+    "enabled": true,
+    "kind": "html",
+    "source_type": "company_official",
+    "supported_parsers": [
+      "html_card"
+    ],
+    "verification": {
+      "status": "verified",
+      "verified_real_search": true,
+      "checked_at": "2026-10-08T13:49:16.468481+00:00",
+      "last_success_at": "2026-10-08T13:49:16.468481+00:00",
+      "parsed_count": 5,
+      "eligible_count": 1,
+      "eligible_cities": {
+        "广州": 1,
+        "上海": 0,
+        "深圳": 0
+      },
+      "actual_parsers": [
+        "html_card"
+      ],
+      "failure_reason": null,
+      "recruiting_evidence": "官方在招卡片；实习/2027届明确，无截止日期，投递前复核。"
+    }
+  },
+  {
+    "name": "Coremail官方校园招聘",
+    "company": "广东盈世计算机科技有限公司（Coremail）",
+    "url": "https://www.coremail.cn/join2_3.html",
+    "search_city": "广州",
+    "enabled": true,
+    "kind": "html",
+    "source_type": "company_official",
+    "supported_parsers": [
+      "html_card（校园栏目/展开卡片）"
+    ],
+    "verification": {
+      "status": "verified",
+      "verified_real_search": true,
+      "checked_at": "2026-10-08T13:49:16.468481+00:00",
+      "last_success_at": "2026-10-08T13:49:16.468481+00:00",
+      "parsed_count": 4,
+      "eligible_count": 1,
+      "eligible_cities": {
+        "广州": 1,
+        "上海": 0,
+        "深圳": 0
+      },
+      "actual_parsers": [
+        "html_card"
+      ],
+      "failure_reason": null,
+      "recruiting_evidence": "官方选中校园招聘栏目；广州开发岗完整JD，但实习类型/2027届待确认。"
+    }
+  },
+  {
+    "name": "物自体官方招聘（上海备选）",
+    "company": "物自体（上海）科技有限公司",
+    "url": "https://www.noumena.com.cn/career/",
+    "search_city": "上海",
+    "enabled": true,
+    "kind": "html",
+    "source_type": "company_official",
+    "supported_parsers": [
+      "html_card（details/summary及所在章节地点）"
+    ],
+    "verification": {
+      "status": "verified",
+      "verified_real_search": true,
+      "checked_at": "2026-10-08T13:50:49.101157+00:00",
+      "last_success_at": "2026-10-08T13:50:49.101157+00:00",
+      "parsed_count": 9,
+      "eligible_count": 2,
+      "eligible_cities": {
+        "广州": 0,
+        "上海": 2,
+        "深圳": 0
+      },
+      "actual_parsers": [
+        "html_card"
+      ],
+      "failure_reason": null,
+      "recruiting_evidence": "官方开放岗位章节；上海研发实习明确，2027届未限定。另有类型未知的全栈岗，仅作待确认线索。"
+    }
+  },
+  {
+    "name": "万物构想官方招聘",
+    "company": "万物构想",
+    "url": "https://cogineai.com/",
+    "search_city": "广州",
+    "enabled": false,
+    "kind": "html",
+    "source_type": "company_official",
+    "supported_parsers": [
+      "html"
+    ],
+    "verification": {
+      "verified_real_search": false,
+      "status": "readable_parse_failed",
+      "last_success_at": null,
+      "failure_reason": "页面可读，但只公布岗位标题/邮箱，缺少完整JD，未启用。",
+      "checked_at": "2026-10-08T13:39:53.872933+00:00"
+    }
+  },
+  {
+    "name": "三七互娱官方招聘",
+    "company": "三七互娱",
+    "url": "https://zhaopin.37.com/index.php?a=recruit&c=recruit&m=Home&recruit=2",
+    "search_city": "广州",
+    "enabled": false,
+    "kind": "html",
+    "source_type": "company_official",
+    "supported_parsers": [
+      "html"
+    ],
+    "verification": {
+      "verified_real_search": false,
+      "status": "fetch_failed",
+      "last_success_at": null,
+      "failure_reason": "现有安全读取器遇到HTTP 302即停止，未跟随跳转；搜索缓存可见岗位不等于运行时接入成功。",
+      "checked_at": "2026-10-08T13:39:56.063154+00:00"
+    }
+  },
+  {
+    "name": "蓝曜炬辉官方招聘",
+    "company": "广州市蓝曜炬辉科技有限公司",
+    "url": "https://www.lanyaoai.com/careers",
+    "search_city": "广州",
+    "enabled": false,
+    "kind": "html",
+    "source_type": "company_official",
+    "supported_parsers": [
+      "html"
+    ],
+    "verification": {
+      "verified_real_search": false,
+      "status": "readable_parse_failed",
+      "last_success_at": null,
+      "failure_reason": "页面可读，但公开静态内容缺少具体职责/要求与实习类型，未取得可靠JD。",
+      "checked_at": "2026-10-08T13:40:39.556607+00:00"
+    }
+  },
+  {
+    "name": "暨南大学公开就业网（贪玩AI实习线索）",
+    "company": "广州贪玩信息技术有限公司",
+    "url": "https://scdc.jnu.edu.cn/job/view/id/2613444",
+    "search_city": "广州",
+    "enabled": false,
+    "kind": "html",
+    "source_type": "public_university",
+    "supported_parsers": [
+      "html_labels"
+    ],
+    "verification": {
+      "verified_real_search": false,
+      "status": "no_open_jobs",
+      "last_success_at": null,
+      "failure_reason": "岗位详情明确显示信息已过期，无法查看，不计为在招岗位。",
+      "checked_at": "2026-10-08T13:41:12.292524+00:00"
+    }
+  },
+  {
+    "name": "南开大学公开就业网（树根互联线索）",
+    "company": "树根互联股份有限公司",
+    "url": "https://career.nankai.edu.cn/correcruit/content/id/117156.html",
+    "search_city": "广州",
+    "enabled": false,
+    "kind": "html",
+    "source_type": "public_university",
+    "supported_parsers": [
+      "html_labels"
+    ],
+    "verification": {
+      "verified_real_search": false,
+      "status": "readable_parse_failed",
+      "last_success_at": null,
+      "failure_reason": "页面可读，现有解析未通过；原文职责/任职要求标签倒置，工作地域仅写广东省，不以公司地址补猜。",
+      "checked_at": "2026-10-08T13:40:37.609942+00:00"
+    }
+  }
+]

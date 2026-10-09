@@ -10,6 +10,7 @@ from .discovery import analyze_candidates, print_priority_list
 from .resume_loader import load_resume
 from .runtime import JobRuntime
 from .search import JobCandidate, PublicFetcher, load_sources, search_public
+from .source_health import SourceHealthStore, print_source_checks
 
 
 def is_search(args):
@@ -99,19 +100,23 @@ async def run_search(args, resume, emit, approve_llm):
     runtime = JobRuntime(PROJECT, emit, demo=True, state_dir=args.state_dir, session_id=args.session,
                          mode=mode, model=getattr(args, "model", None), fallback=getattr(args, "fallback", "local"), approve_llm=approve_llm)
     try:
+        SourceHealthStore(runtime.workspace.memory).record(search.get("source_checks", []))
         result = await analyze_candidates(runtime, search["candidates"], resume, getattr(args, "analyze_limit", 2), getattr(args, "search_only", False),
                                           min(getattr(args, "city_min", 2), getattr(args, "search_limit", 8)), getattr(args, "guangzhou_only", False))
         result["rejected"].extend(search.get("excluded", []))
         result["city_policy"] = search["city_policy"]
         result.update(search_issues=search["issues"], http_requests=search["http_requests"],
+                      source_checks=search.get("source_checks", []), source_health=SourceHealthStore(runtime.workspace.memory).list(),
                       input_kind="artificial_or_imported" if fixture else "public_network", analysis_usage=runtime.usage())
         print_priority_list(result)
+        print_source_checks(result["source_checks"])
         path = runtime.workspace.root / ("priority-list-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%f") + ".json")
         with path.open("x", encoding="utf-8") as stream:
             json.dump(result, stream, ensure_ascii=False, indent=2)
         path.chmod(0o600)
         print("本地完整报告：" + str(path))
-        return 0
+        # 所有来源失败不能作为成功退出；保留报告与历史，供系统/验收判断。
+        return 1 if not search["candidates"] and search["issues"] else 0
     finally:
         await runtime.close()
         print("Job Agent v3 已退出；" + json.dumps(runtime.usage(), ensure_ascii=False))

@@ -22,6 +22,7 @@ from job_agent.runtime import JobRuntime
 from job_agent.scheduler import DailyUpdates, check_lock, validate_update_args
 from job_agent.search import JobCandidate, PublicFetcher
 from job_agent.update_store import CHINA, daily_time, next_daily
+from job_agent.source_health import SourceHealthStore, source_check
 
 
 JD = "工作地点：广州\n岗位职责：开发 AI Agent 应用，实现工具调用、工作流和自动测试。\n任职要求：2027届本科在读，专业不限；熟悉Python、Git。\n加分项：了解RAG。\n成长：导师带教，技术分享。"
@@ -111,6 +112,15 @@ class DailyUpdateTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(await self.updates.tick())
         self.search.assert_not_called()
         self.assertIsNone(self.updates.store.last_check())
+
+    async def test_source_verification_is_persisted_in_same_job_database_and_last_check(self):
+        check = source_check(dict(name="人工来源", url=job().url, kind="html"), [job()], [job().url], [], self.clock().isoformat())
+        self.search.side_effect = None
+        self.search.return_value = {"candidates": self.candidates, "issues": [], "http_requests": 0, "source_checks": [check]}
+        summary = await self.check()
+        self.assertEqual(summary["source_checks"][0]["status"], "verified")
+        self.assertEqual(self.updates.store.last_check()["summary"]["source_health"][0]["last_success_at"], check["checked_at"])
+        self.assertEqual(SourceHealthStore(self.runtime.workspace.memory).list()[0]["eligible_count"], 1)
 
     async def test_exact_due_triggers_once_and_saves_next_daily(self):
         self.updates.configure("09:00")

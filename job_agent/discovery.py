@@ -65,6 +65,9 @@ def graduation_fit(jd, year=2027):
 
 def candidate_filter(job):
     reasons = []
+    if (getattr(job, "parsing_evidence", None) or {}).get("availability") == "closed" or re.search(
+            r"(?:岗位状态|招聘状态|职位状态)[:：]?\s*(?:已关闭|已下线|已结束|已过期|停止招聘)|(?:该|本|当前)(?:岗位|职位)(?:已关闭|已下线|已结束|已过期|停止招聘)", job.jd):
+        reasons.append("来源明确标记岗位已关闭/已过期，不进入候选。")
     location = city_fit(job)
     if location["priority"] == 4:
         reasons.append("实际工作地点不在广州/上海/深圳或地点待确认，本轮不进入核心候选。")

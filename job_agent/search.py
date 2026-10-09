@@ -21,8 +21,8 @@ from .html_cards import static_cards
 USER_AGENT = "JobAgent/3.0"
 MAX_RESPONSE_BYTES = 1_000_000
 MAX_HTTP_REQUESTS = 24
-MAX_SOURCES = 3
-AI_DIRECTION = r"ai\s*agent|ai\s*(?:应用|工作流|applications?)|(?<![a-z0-9_])(?:llm|rag)(?![a-z0-9_])|agent\s*(?:开发|工程|实习)|ai\s*(?:工程|engineer)|智能体|大模型(?:应用|开发|研发|工程)|人工智能.*(?:应用|工程)"
+MAX_SOURCES = 8
+AI_DIRECTION = r"ai\s*agent|ai\s*(?:应用|工作流|applications?)|(?<![a-z0-9_])(?:llm|rag)(?![a-z0-9_])|agent\s*(?:开发|工程|实习)|ai\s*(?:开发|工程|engineer)|智能体|大模型(?:应用|开发|研发|工程)|人工智能.*(?:应用|工程)"
 INTERNSHIP = r"实习|intern(?:ship)?"
 
 
@@ -201,6 +201,8 @@ def parse_public_page(body, source, url, now=None):
     page = Page()
     page.feed(body)
     result, issues = [], []
+    if re.search(r"信息已过期[，,\s]*无法查看|该职位已下线[，,\s]*无法查看", plain_html(body)):
+        return [], [], ["来源明确标记信息已过期/职位已下线，不导入旧岗位。"]
     ids = {node["@id"]: node for structured in page.structured for node in structured_nodes(structured)
            if isinstance(node.get("@id"), str)}
 
@@ -233,7 +235,7 @@ def parse_public_page(body, source, url, now=None):
                     parsing_evidence={"method": "json_ld_jobposting", "title": row["title"], "location": cities, "company": company} ))
             except (ValueError, TypeError, KeyError, AttributeError):
                 issues.append("来源可读但解析失败：JSON-LD岗位字段不完整，跳过。")
-    cards, card_links, card_issues = static_cards(body, source)
+    cards, card_links, card_issues = static_cards(body, source, url)
     page.links.extend(link for link in card_links if link not in page.links)
     issues.extend(card_issues)
     for card in cards:
@@ -321,9 +323,11 @@ def load_sources(text):
             raise ValueError("search_city 只能为广州、上海、深圳或不限；它表示搜索阶段，不是岗位地点。")
         if contains_credentials(json.dumps(source, ensure_ascii=False)):
             raise ValueError("来源配置疑似含凭据。")
+        if any(old["url"] == source["url"] for old in enabled):
+            raise ValueError("来源URL重复；同一公开页面只配置一次，多城市可使用 search_city=不限。")
         enabled.append(source)
     if not 1 <= len(enabled) <= MAX_SOURCES:
-        raise ValueError("需要启用 1 到 3 个已核验公开来源；模板默认全部禁用。")
+        raise ValueError(f"需要启用 1 到 {MAX_SOURCES} 个已核验公开来源；模板默认全部禁用。")
     return enabled
 
 
@@ -403,9 +407,12 @@ async def search_public(sources, fetcher, limit=8, city_min=2, guangzhou_only=Fa
     """按显式来源阶段搜索；上一阶段已足够时不访问下一城市来源。"""
     from .city_policy import CITY_ORDER, city_fit, select_cities, selected_with_aliases
     from .discovery import candidate_filter, similar_job
+    from .source_health import source_check
     if not 1 <= limit <= 20 or not 1 <= city_min <= 20:
         raise ValueError("候选上限与城市扩展阈值需要 1 到 20。")
     found, issues, visited, stages = [], [], set(), []
+    checked_at = utc_now()
+    source_runs = {source["url"]: {"jobs": [], "pages": [], "failures": []} for source in sources}
     selected = None
     for city in CITY_ORDER:
         enough_now = sum(city_fit(job)["city"] in stages for job in selected["selected"]) if selected else 0
@@ -414,6 +421,7 @@ async def search_public(sources, fetcher, limit=8, city_min=2, guangzhou_only=Fa
         stages.append(city)
         stage_sources = [s for s in sources if s.get("search_city", "广州") in (city, "不限")]
         for source in stage_sources:
+            run = source_runs[source["url"]]
             queue = [source["url"]]
             pages = 0
             while queue and pages < 4:
@@ -424,6 +432,7 @@ async def search_public(sources, fetcher, limit=8, city_min=2, guangzhou_only=Fa
                 pages += 1
                 try:
                     body = await fetcher.fetch(url)
+                    run["pages"].append(url)
                     if source["kind"] == "greenhouse":
                         jobs, errors = parse_greenhouse(body, source)
                     else:
@@ -437,9 +446,13 @@ async def search_public(sources, fetcher, limit=8, city_min=2, guangzhou_only=Fa
                                         continue
                                     if urlsplit(linked).hostname == urlsplit(source["url"]).hostname:
                                         queue.append(linked)
+                    # 同页先保留明确实习，再校招；不把类型未知的职位排在实习前。
+                    jobs.sort(key=lambda job: {"实习": 0, "校招": 1}.get(job.recruitment_type, 2))
                     for job in jobs:
                         if re.search(AI_DIRECTION, job.title, re.I) and not any(job.url == old.url and similar_job(job, old) for old in found):
                             found.append(job)
+                    run["jobs"].extend(jobs)
+                    run["failures"].extend(errors)
                     issues.extend({"source": source["name"], "source_url": source["url"], "page_url": url, "reason": error} for error in errors)
 
                     counted = select_cities(found, city_min, guangzhou_only, limit,
@@ -450,6 +463,7 @@ async def search_public(sources, fetcher, limit=8, city_min=2, guangzhou_only=Fa
                 except (ValueError, KeyError, TypeError, RecursionError, OSError) as error:
                     message = str(error) if isinstance(error, ValueError) and not isinstance(error, json.JSONDecodeError) else "来源格式或网络无效，跳过。"
                     issues.append({"source": source["name"], "source_url": source["url"], "page_url": url, "reason": message})
+                    run["failures"].append(message)
             selected = select_cities(found, city_min, guangzhou_only, limit,
                                      eligible=lambda job: candidate_filter(job)["eligible"], same_job=similar_job)
             # 上海/深圳混入前一阶段的公开列表，不计为广州有效数量。
@@ -466,5 +480,10 @@ async def search_public(sources, fetcher, limit=8, city_min=2, guangzhou_only=Fa
     # 输出只含核心候选；被筛除/城市未启用的线索只保留解释，不继续分析。
     excluded = [{"candidate": job.to_dict(), "reasons": candidate_filter(job)["reasons"] or ["该城市阶段未启用或无需补充，不进入核心候选。"]}
                 for job in [*selected["excluded"], *selected["deferred"]][:limit]]
+    checks = [source_check(source, run["jobs"], run["pages"], run["failures"], checked_at)
+              if run["pages"] or run["failures"] else
+              {"name": source["name"], "url": source["url"], "status": "not_checked", "last_success_at": None}
+              for source in sources for run in [source_runs[source["url"]]]]
     return {"candidates": selected_with_aliases(selected, found, limit, similar_job), "issues": issues, "http_requests": fetcher.requests,
+            "source_checks": checks,
             "city_policy": selected["policy"], "excluded": excluded}

@@ -144,7 +144,9 @@ cd ~/ai-agent-lab
 
 每日时间按**北京时间**，默认沿用广州 >>> 上海 > 深圳；广州不足才扩展上海，再不足扩展深圳，原有高质量岗位越级条件不变。来源格式沿用 v3，模板默认禁用，不会自行启用来源。无需新增 Key 或安装工具。
 
-下次在同一个状态目录重启 `--watch`，保留简历、来源和 `--allow-network` 参数，可以省略 `--daily-at` 恢复原时间；改变 `--daily-at` 才会重算计划。**进程保持运行才会检查；退出或关机后暂停，重启到期时最多补查一次。** 没有安装系统开机服务。输入 `/quit` 或 Ctrl+C 会取消当前任务，保存计划和已发现岗位，后续可恢复。
+下次在同一个状态目录重启 `--watch`，保留简历、来源和 `--allow-network` 参数，可以省略 `--daily-at` 恢复原时间；改变 `--daily-at` 才会重算计划。**watch进程保持运行才会检查；退出或关机后暂停，重启到期时最多补查一次。** 输入 `/quit` 或 Ctrl+C 会取消当前任务，保存计划和已发现岗位，后续可恢复。
+
+macOS希望关闭Terminal后仍自动检查时，使用 [系统每日部署说明](../docs/MACOS_DAILY.md)。它复用相同v5状态、去重和摘要，默认北京时间09:00，固定local；准备配置不安装系统任务，实际启用必须单独确认。不要同时开启watch与系统部署来重复安排同一份岗位库。
 
 不想保持交互进程时，手动立即检查一次：把真实模板中的 `--watch --daily-at 09:00` 换成 `--check-now`。此操作不会改掉已保存的每日计划。
 
@@ -379,7 +381,7 @@ cd ~/ai-agent-lab
 
 默认使用人工个人背景。可加 `--resume "/绝对路径/我的简历.pdf"`，继续支持PDF/DOCX/TXT/MD。重复运行会复用同岗位、同背景的分析；`--state-dir .agent-platform/job-v3-demo` 可与已有状态隔离。自备岗位结果JSON可用 `--search-fixture /绝对路径/jobs.json`，字段参考 [search-jobs.example.json](examples/search-jobs.example.json)，先按城市、有效性与去重筛选，再导入最多8项；跨来源别名在剩余额度内保留。
 
-此前小范围真实验收已验证部分高校页面读取、保存和去重；本轮新版城市策略只完成离线/mock验证，重新真实搜索需先确认。必须先核验具体公开来源。复制 [search-sources.example.json](examples/search-sources.example.json) 为自己的JSON配置，填入公开列表页地址或已核验的Greenhouse企业board；只启用1–3个来源。模板全部禁用，不会误访问示例域名。HTML来源支持JobPosting JSON-LD或明确公司/岗位/地点/任职要求的静态详情；动态JS页面、登录、验证码、robots禁止和重定向会跳过，不能保证各招聘网站都能读取。
+已有公开来源接入与城市策略验收记录见 [来源核验记录](SOURCE_VERIFICATION.md)。来源信息会变化，每轮仍重新读取并过滤。自定义来源必须先核验。复制 [search-sources.example.json](examples/search-sources.example.json) 为自己的JSON配置，填入公开列表页地址或已核验的Greenhouse企业board；只启用1–8个来源（全轮仍最多24次HTTP请求）。模板全部禁用，不会误访问示例域名。HTML来源支持JobPosting JSON-LD或明确公司/岗位/地点/任职要求的静态详情；动态JS页面、登录、验证码、robots禁止和重定向会跳过，不能保证各招聘网站都能读取。
 
 用户确认后第一次可只搜索，不分析、不发送简历：
 
@@ -397,7 +399,7 @@ cd ~/ai-agent-lab
 
 输出包括“高优先级/可以尝试/当前差距较大”，每条附综合匹配度、必须技能状态数量、城市、招聘类型、2027届判断、证据与原始链接。被筛除/尚未分析岗位单列，未知届别不会当作符合。结构化完整报告写入原状态目录的 `priority-list-时间.json`；原SQLite增加岗位来源/跨会话分析缓存。包含必要简历证据片段，请按个人求职资料保管，不上传或公开。
 
-搜索只在配置来源内执行，范围与数量有上限，不代表全网岗位覆盖。模板JSON不是可执行脚本。搜索不从网页接受文件路径；简历不会发送给招聘来源。新版城市策略尚未重新进行真实网络验收，本轮只做离线/mock验证。
+搜索只在配置来源内执行，范围与数量有上限，不代表全网岗位覆盖。模板JSON不是可执行脚本。搜索不从网页接受文件路径；简历不会发送给招聘来源。本轮已用公开官方页面验证广州-only自动解析与上海适配；没有使用真实简历或付费模型。
 
 ### 城市搜索与可解释排序
 
@@ -466,3 +468,22 @@ cd ~/ai-agent-lab
 ```
 
 用户确认该方案后，在已设置环境变量的Mac Terminal中运行同一命令加 `--run`；脚本先展示全部人工材料、端点、模型、推理/输出参数和费用，再要求输入“确认面试验收”。本轮仍最多1次、不重试、不修正；这是单次验收的明确范围，不是生产Skill默认限制。结果保存于 `.agent-platform/job-v6-interview-final-api-acceptance`；已有记录只显示，不再请求。历史首次验收脚本仅用于保留当时4096/none、两次/0.35元范围，不能代表当前业务默认质量。
+
+## 已核验公开来源（工程化第二阶段）
+
+[public-careers.json](sources/public-careers.json) 已启用飞派、Coremail 两个广州官方页面，以及广州不足时的上海物自体官方页面。其他5条线索因缺JD、过期、解析或重定向问题保持禁用。新增来源、解析方式、检查时间和失败原因见 [来源核验记录](SOURCE_VERIFICATION.md)。这是少量指定页面的定向发现，不是全网搜索。
+
+在项目根目录先运行只搜索验收（无简历、无LLM）：
+
+```zsh
+.venv/bin/python -B main.py --agent job --search \
+  --sources job_agent/sources/public-careers.json --allow-network \
+  --search-only --guangzhou-only --search-limit 5 \
+  --state-dir .agent-platform/public-source-check
+```
+
+默认城市阈值为2个有效去重候选。去掉 `--guangzhou-only` 后，广州不足才读取上海；深圳阶段逻辑保留，但当前核验配置没有启用深圳来源，不会临时扩大域名。Coremail 是校招页，不能直接认定2027届实习可投；无明确截止日期的官方岗位仍需投递前复核。
+
+匹配简历时，在上面命令中去掉 `--search-only`，加入 `--mode local --resume "/绝对路径/简历.pdf" --analyze-limit 2`。也可沿用 `--check-now` / 每日计划并将 `--sources` 指向该配置；本轮不启动长期任务。搜索模式和 LLM 模式分开，来源不会接收简历，付费分析仍需单独确认。
+
+每轮完整报告新增 `source_checks`；历史最近检查/最近成功检查及失败原因存入同一个本地 `jobs.sqlite` 的 `job_source_checks` 表，并在检查摘要的 `source_health` 中保留。未触发的上海/深圳显示 `not_checked`，不会冒充验证失败或覆盖上次成功时间。配置中的核验时间是本次接入快照，运行后的新时间保存在本地库，不改写公共配置。

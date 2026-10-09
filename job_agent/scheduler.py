@@ -17,6 +17,7 @@ from .resume_loader import load_resume
 from .runtime import JobRuntime
 from .search_cli import collect_search, read_json_file, validate_search_args
 from .search import JobCandidate, load_sources
+from .source_health import SourceHealthStore, print_source_checks
 from .update_store import UpdateStore, make_summary, print_update, utc_clock
 
 
@@ -151,15 +152,19 @@ class DailyUpdates:
                         resume_path = self.runtime.workspace.project / "job_agent/examples/resume.example.md"
                     resume = load_resume(resume_path)[0]
                     search = await self.search(self.args)
+                    SourceHealthStore(self.runtime.workspace.memory).record(search.get("source_checks", []))
                     worker = JobRuntime(self.runtime.workspace.project, self.runtime.sink, demo=True, mode="local",
                                         state_dir=self.runtime.workspace.root, session_id="daily-updates")
                     summary = await self._analyze_updates(worker, search, resume, run_id)
+                    summary["source_checks"] = search.get("source_checks", [])
+                    summary["source_health"] = SourceHealthStore(self.runtime.workspace.memory).list()
                     status = "partial" if summary["issues"] else "completed"
                     if summary["issues"] and not search["candidates"]:
                         status = "failed"
                     self.store.finish(run_id, self.clock(), summary, status)
                     print("\n岗位检查结束：" + status)
                     print_update(summary)
+                    print_source_checks(summary["source_checks"])
                     return summary
             except asyncio.CancelledError:
                 summary = make_summary(self.store.rows(run_id), issues=[{"reason": "检查已中断，已发现的岗位和投递进度保留。"}])
