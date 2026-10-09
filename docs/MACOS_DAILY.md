@@ -55,7 +55,7 @@ sh .agent-platform/macos-daily/enable.sh
 launchctl print gui/$(id -u)/local.ai-agent-lab.job-agent
 ```
 
-既有交互CLI的 `/last-check`、`/new-jobs`、`/jobs` 可继续使用同一状态目录。完整摘要保存在现有 `jobs.sqlite`；部署状态在 `dispatch.json`，只含状态/计数的事件在 `events.jsonl`，超过约1MiB保留一份轮换日志。不要公开这些文件。解释器尚未启动成功的错误见 `startup.log` 或 `launchctl print` 的退出码。
+既有交互CLI的 `/last-check`、`/new-jobs`、`/jobs` 可继续使用同一状态目录。完整摘要保存在现有 `jobs.sqlite`；部署状态在 `dispatch.json`，只含状态/计数的事件在 `events.jsonl`，超过约1MiB保留一份轮换日志。不要公开这些文件。解释器尚未启动成功的错误见 `startup.log` 或 `launchctl print` 的退出码。 `startup.log`不自动轮换；若持续出现启动配置错误，应停用并修复，再人工检查日志大小。它不包含正式业务输出。
 
 手动立即检查不会改变每日计划：
 

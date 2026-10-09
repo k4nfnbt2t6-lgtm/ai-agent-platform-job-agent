@@ -2,18 +2,46 @@
 
 一个复用统一 Agent 底座的技术实习求职项目。Platform 提供工具调用、文件与 Terminal、会话、记忆、权限、任务管理和子 Agent；Job Agent 在同一底座上完成岗位搜索、分析、评分、岗位库、每日检查、简历优化与面试准备。
 
-默认使用 **local / 本地模拟模式**，无需 API Key，不产生模型 API 费用。模拟和规则测试不能代替真实模型质量验收。Job Agent v6 已完成真实人工材料验收与人工质量审查；原始请求、响应和个人求职资料仅保留本地。
+默认使用 **local**：Platform 使用本地模拟模型演示工具循环，Job Agent 使用本地规则分析。离线示例无需 API Key，不产生模型 API 费用；真实公开岗位搜索仍需要网络。模拟和规则测试不能代替真实模型质量验收。Job Agent v6 已完成真实人工材料验收与人工质量审查；原始请求、响应和个人求职资料仅保留本地。
+
+## 项目解决什么问题
+
+把分散的 Agent 实验整合成可运行的统一底座，再以求职工作流验证工具编排、数据持久化和真实性约束：
+
+```text
+公开岗位来源 → 提取JD → 本地过滤/去重 → 三个分析Skill
+                                         ↓
+                                证据匹配 + 分层评分
+                                         ↓
+                               SQLite岗位库与手动状态
+                                         ↓
+                         岗位定制简历 + 十道面试题/准备清单
+```
+
+重点工程实践：**有证据的技能匹配、组合要求评分、稳定岗位编号、幂等更新、受控LLM调用与持久调度**。Python基础不会升级成熟练，职业目标不会计作能力，项目描述不能借用其他项目的证据。
+
+| 阶段 | 已实现的能力 |
+| --- | --- |
+| Platform v1.0 | 统一入口、Agent Loop、Tool Calling、会话/记忆、权限与Diff、受限子Agent、后台/定时任务 |
+| Job Agent v1 | analyze-jd / match-resume / skill-gap-analysis、岗位去重、本地简历读取 |
+| v2 | local / llm双模式、结构化输出、证据校验与分层评分 |
+| v3 | 公开岗位搜索、岗位卡片/JSON-LD解析、城市分阶段筛选与可解释排序 |
+| v4 | SQLite岗位库、稳定编号、状态/备注、求职漏斗 |
+| v5 | 每日检查、只分析新增/实质变化、更新摘要与调度恢复 |
+| v6 | resume-tailor / interview-prep、独立材料输出、项目证据与学习状态一致性 |
+
+这是AI辅助开发项目。本人可展示的理解与验证、仍需学习的实现，以及没有实现的能力，见 [作品集与贡献边界](docs/PORTFOLIO.md)。
 
 ## 环境与安装
 
-已验证 Python 3.14。依赖固定在 [requirements.txt](requirements.txt)。在项目目录执行：
+已验证 Python 3.14。依赖固定在 [requirements.txt](requirements.txt)。下载源码后，进入包含 `main.py` 的项目根目录执行：
 
 ```zsh
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
-已有虚拟环境可以直接复用，安装前核对依赖文件。PDF 使用 pypdf 本地解析，DOCX/TXT/MD 同样不需要模型 API。
+安装完成后运行 `.venv/bin/python -m pip check`；应显示依赖一致。无需安装Skill、浏览器插件或MCP即可完成下面的离线演示。已有虚拟环境可以直接复用，安装前核对依赖文件。PDF 使用 pypdf 本地解析，DOCX/TXT/MD 同样不需要模型 API。
 
 ## 最简单的启动方式
 
@@ -73,6 +101,20 @@ Platform 的示例文件与状态在 `.agent-platform/` 下，不操作任意源
 公开岗位搜索需要明确启用可信来源与网络访问；不登录、不绕验证码。每日检查固定使用 local，不自动调用收费模型。`--watch` 需要进程持续运行；macOS 可准备 [launchd 每日部署](docs/MACOS_DAILY.md)，关闭 Terminal 后仍由系统触发，实际安装启用前需要本人确认。
 
 详细命令、搜索与调度设置见 [Job Agent 说明](job_agent/README.md)。
+
+## 离线搜索与每日摘要演示
+
+以下只使用人工岗位，不访问招聘站，也不调用模型API：
+
+```sh
+.venv/bin/python -B main.py --agent job --search-demo --mode local \
+  --state-dir .agent-platform/job-search-demo
+
+.venv/bin/python -B main.py --agent job --check-now --search-demo --mode local \
+  --state-dir .agent-platform/job-daily-demo
+```
+
+各自重复运行同一命令，未变化的岗位应复用分析、保持编号；每日摘要的新分析数应为0。`/last-check`、`/new-jobs`必须使用对应的同一状态目录查看。真实搜索需要另行启用公开来源和 `--allow-network`，命令与来源边界见 [来源核验](job_agent/SOURCE_VERIFICATION.md) 与 [搜索说明](job_agent/README.md#已核验公开来源工程化第二阶段)。
 
 ## 架构与工程能力
 
@@ -134,8 +176,10 @@ docs/                    架构、macOS部署、作品集及最终审查说明
 
 真实简历、个人信息、密钥、数据库、状态、运行日志、真实 API 请求/响应、个人授权指令与历史运行笔记仅留本地。`.gitignore` 是防误提交措施，不能加密文件，也不能阻止 `git add -f`；每次提交/上传前仍需审查暂存区。详见 [安全说明](SECURITY.md)。未经明确授权不推送、不发布、不上传材料。
 
-公开副本的离线测试和演示已单独验收；真实搜索或系统调度尚未通过的部分不得用旧缓存和mock冒充。最新工程审查和限制见 [最终工程审查](docs/ENGINEERING_REVIEW.md)。仓库尚未声明开源许可证，发布前由所有者决定授权方式。
+公开副本的离线测试和演示已单独验收。2026-10-09本机全量测试684项通过；公开副本681项通过、3项私人响应重放明确跳过。真实来源曾完成成功搜索/去重验收，后续部署检查又遇到安全地址校验拒绝访问；联网结果随本机环境与站点变化，不能保证每次成功。macOS任务已在所有者本机经授权安装，真实到点/唤醒运行仍待观察；克隆仓库不会安装系统任务。最新工程审查和限制见 [最终工程审查](docs/ENGINEERING_REVIEW.md)。按所有者决定，当前暂不添加开源许可证；公开可见不等于授予任意复用许可。
 
 ## 公开岗位来源
 
 已核验的官方来源配置、真实可用性及未启用原因见 [岗位来源核验](job_agent/SOURCE_VERIFICATION.md)。广州优先，不足才上海、再深圳；搜索保持公开只读，不向招聘来源发送简历。只搜索的完整命令见 [Job Agent 说明](job_agent/README.md#已核验公开来源工程化第二阶段)。
+
+发布前身份处理、仓库名称/简介和确认清单见 [GitHub发布准备](docs/GITHUB_RELEASE.md)。
