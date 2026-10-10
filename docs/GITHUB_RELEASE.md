@@ -50,3 +50,11 @@ local是规则匹配/固定编排，不能替代所有语义分析；LLM须先�
 - 本地历史身份已按授权处理，文件树/说明/时间逐项保留；6份文档使用公开身份提交。业务源码与每日任务配置不变，未创建远程仓库或推送。
 
 公开源码与历史身份准备完成，等待正式发布授权。本机安全扫描是防误公开检查，不替代专业安全审计。
+
+## 2026-10-10 稳定版本更新准备
+
+远程 main 已有原稳定版本；本次仅整理本地成果，不创建仓库、不推送、不重写历史。`codex/job-automation`、`codex/open-source-integration` 当前均指向原稳定提交；后续成果已集中在 `codex/application-integration` 的 f77632e，无需重复合并。发布整理分支 `codex/portfolio-stable-release` 在其上保留真实 JD 验收的四条边界回归，并统一 README、架构和作品集边界。
+
+推荐确认后仅更新远程 main：先拉取并核对 origin/main，确认它仍是本地 main 的祖先；本地 main 以 `git merge --ff-only codex/portfolio-stable-release` 快进，检查拟推送的提交范围与内容，然后只执行 `git push origin main:main`。不使用 force、mirror、all 或附带 tags。若远程已有他人更新，停止并重新评估，不能强推覆盖。更新代码不等于获准启用自动 LLM、外发真实资料、部署新的每日配置或真实投递。
+
+本次文件与历史审查、安装复现和测试以 [稳定版审查](STABLE_RELEASE_REVIEW.md) 为准。

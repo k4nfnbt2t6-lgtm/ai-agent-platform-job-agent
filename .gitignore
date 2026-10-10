@@ -35,6 +35,10 @@ dist/
 private/
 local-data/
 resumes/
+photos/
+*resume_photo*
+*证件照*
+*简历照*
 logs/
 *.sqlite
 *.sqlite3

@@ -7,7 +7,7 @@
 在项目目录执行，使用官方PyPI包与Playwright官方浏览器下载；不安装系统任务或浏览器扩展：
 
 ```bash
-cd ~/ai-agent-lab
+# 在包含 main.py 的项目根目录执行
 .venv/bin/python -m venv .agent-platform/browser-eval-venv
 .agent-platform/browser-eval-venv/bin/python -m pip install --only-binary=:all: -r requirements.txt -r requirements-browser.txt
 export PLAYWRIGHT_BROWSERS_PATH="$PWD/.agent-platform/playwright-browsers"

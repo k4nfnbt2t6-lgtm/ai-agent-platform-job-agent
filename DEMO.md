@@ -3,7 +3,7 @@
 启动：
 
 ```zsh
-cd ~/ai-agent-lab
+# 在包含 main.py 的项目根目录执行
 .venv/bin/python -B main.py --state-dir .agent-platform/interview --session interview
 ```
 
