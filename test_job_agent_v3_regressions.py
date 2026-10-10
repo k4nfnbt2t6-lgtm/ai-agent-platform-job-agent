@@ -109,6 +109,18 @@ class RequirementGroupTests(unittest.TestCase):
         self.assertEqual(result['match_scores']['overall']['percent'], 0)
         self.assertTrue(result['technical_matches'][0].get('group_id'))
 
+    def test_unregistered_project_domain_does_not_accept_unrelated_project(self):
+        resume = '项目：已完成Job Agent项目\n技术栈：Python基础\n正在学习FastAPI'
+        result = match('有Python / FastAPI或前后端项目经验', resume)
+        self.assertEqual(result['experience'][-1]['requirement'], '前后端项目经验')
+        self.assertEqual(result['experience'][-1]['status'], 'needs_confirmation')
+        self.assertNotEqual(result['technical_matches'][0]['status'], 'matched')
+        self.assertLess(result['match_scores']['overall']['percent'], 100)
+
+    def test_generic_project_experience_still_accepts_real_project(self):
+        result = match('有项目经验', '项目：已完成Job Agent项目')
+        self.assertEqual(result['experience'][0]['status'], 'matched')
+
     def test_bonus_group_keeps_lower_weight(self):
         result = match('掌握Git\n加分项\n掌握Python或Java', '熟练使用Python')
         self.assertEqual(result['match_scores']['required']['total'], 1)
@@ -122,6 +134,19 @@ class RequirementGroupTests(unittest.TestCase):
 
 
 class ClassificationBoundaryTests(unittest.TestCase):
+    def test_official_careers_headings_separate_duties_requirements_and_bonus(self):
+        jd = analyze_jd('你将负责\n参与RAG与Tool Calling功能开发\n我们期待你\n'
+                        'Python / FastAPI 项目经验\n加分项\n熟悉Docker')
+        self.assertEqual(jd['responsibilities'], ['参与RAG与Tool Calling功能开发'])
+        self.assertEqual({(r['skill'], r['level']) for r in jd['technical_requirements']},
+                         {('Python', 'required'), ('FastAPI', 'required'), ('Docker', 'preferred')})
+
+    def test_official_careers_heading_does_not_upgrade_resume_evidence(self):
+        result = match_resume(analyze_jd('我们期待你\nPython项目经验'),
+                              '技能：Python基础\n目标：AI Agent开发实习')
+        self.assertNotEqual(result['technical_matches'][0]['status'], 'matched')
+        self.assertEqual(result['match_scores']['required']['matched'], 0)
+
     def test_interest_is_not_technical_requirement(self):
         for text in ('对AI Agent/AI应用开发感兴趣', '对Agent、RAG、大模型应用有强烈兴趣与实践热情'):
             with self.subTest(text=text):

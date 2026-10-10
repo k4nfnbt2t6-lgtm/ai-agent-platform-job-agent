@@ -6,7 +6,7 @@ import unicodedata
 
 from .permissions import MAX_MATERIAL_BYTES
 
-ANALYSIS_VERSION = 5
+ANALYSIS_VERSION = 7
 
 SKILLS = {
     "Python": r"\bpython\b",
@@ -89,9 +89,9 @@ def jd_heading(header):
     """编号、Markdown、括号不改变章节含义，避免加分标题漏识别。"""
     header = header.strip().strip("*_# 【】[]()（）")
     header = re.sub(r"^(?:[一二三四五六七八九十]+|\d+)[、.)]\s*", "", header).strip().strip("【】[]()（）")
-    if re.fullmatch(r"岗位职责|工作职责|职位描述|岗位描述|工作内容(?:描述)?|职责|responsibilities|what you(?: will|'ll) do", header, re.I):
+    if re.fullmatch(r"岗位职责|工作职责|职位描述|岗位描述|工作内容(?:描述)?|职责|你将负责|responsibilities|what you(?: will|'ll) do", header, re.I):
         return "responsibilities"
-    if re.fullmatch(r"岗位要求|职位要求|任职要求|任职资格|招聘要求|技术要求|资格要求|基本要求|requirements|qualifications", header, re.I):
+    if re.fullmatch(r"岗位要求|职位要求|任职要求|任职资格|招聘要求|技术要求|资格要求|基本要求|我们期待你|requirements|qualifications", header, re.I):
         return "requirements"
     if re.fullmatch(r"加分项|加分条件|优先条件|优先项|nice[- ]to[- ]have|preferred|bonus", header, re.I):
         return "preferred"
@@ -534,7 +534,12 @@ def experience_match(requirements, resume):
             target = ",".join(contexts)
             technologies = matched_skills(target)
             needs_ai_application = bool(re.search(AI_PROJECT, target, re.I))
+            # 未登记的具体项目领域（如“前后端项目经验”）不能用任意项目代替。
+            # 纯“有项目经验”仍可由真实项目证明；更具体的未知条件转语义/人工核对。
+            generic_project = bool(re.fullmatch(r"(?:有|具有|具备|拥有)?(?:一定的?|相关|实际|真实)?项目(?:经验|经历)", target.strip()))
+            domain_known = bool(technologies or needs_ai_application or generic_project)
             relevant = [project for project in projects if project["status"] == "matched"
+                        and domain_known
                         and (not needs_ai_application or project["ai_application"] or "AI 应用开发" in technologies)
                         and (not technologies or expression_satisfied(choice_expression(target),
                              lambda name: skill_evidence(project["text"], name)[0] == "matched"))]
